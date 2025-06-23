@@ -11,6 +11,8 @@ class Achievement extends Model
     use HasFactory;
 
     protected $fillable = [
-
+        'name',
+        'description',
+        'image_url',
     ];
 }

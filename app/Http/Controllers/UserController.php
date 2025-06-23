@@ -10,7 +10,7 @@ class UserController extends Controller
     public function index()
     {
         $users = User::all();
-        
+
         return response()->json($users, 200);
     }
 
@@ -23,6 +23,8 @@ class UserController extends Controller
 
     public function store(Request $request)
     {
+        $this->validateRequest($request);
+
         $user = User::create($request->all());
 
         return response()->json($user, 201);
@@ -37,9 +39,20 @@ class UserController extends Controller
     }
     public function update($id, Request $request)
     {
+        $this->validateRequest($request);
+
         $user = User::findOrFail($id);
-        $user->upadate($request->all());
+        $user->update($request->all());
 
         return response()->json($user, 200);
+    }
+
+    function validateRequest(Request $request): void
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|max:255|unique:users,email,' . $request->id,
+            'password' => 'required|string|min:8|confirmed',
+        ]);
     }
 }
