@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\SuggestionController;
 use App\Http\Controllers\UserAchievementController;
 use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
@@ -22,6 +23,9 @@ Route::put('/user/{id}', [UserController::class, 'update']);
 Route::get('/user/{id}', [UserController::class, 'show']);
 Route::post('/user', [UserController::class, 'store']);
 Route::get('/user', [UserController::class, 'index']);
+Route::get('/me', [UserController::class, 'me']);
+Route::post('/login', [UserController::class, 'login']);
+Route::post('/register', [UserController::class, 'register']);
 
 
 Route::get('/achievement', [AchievementController::class, 'index']);
@@ -31,3 +35,8 @@ Route::delete('/achievement/{id}', [AchievementController::class, 'delete']);
 Route::put('/achievement/{id}', [AchievementController::class, 'update']);
 
 Route::post('/{userId}/assign/{achievementId}', [UserAchievementController::class, 'assign']);
+Route::get('/{userId}/achievements', [UserAchievementController::class, 'getUserAchievements']);
+
+Route::get('/suggestion', [SuggestionController::class, 'index']);
+Route::post('/suggestion', [SuggestionController::class, 'store']);
+Route::get('/suggestion/{id}', [SuggestionController::class, 'show']);

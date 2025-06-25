@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use App\Models\Achievement;
 
@@ -23,7 +24,12 @@ class AchievementController extends Controller
 
     public function store(Request $request)
     {
-        $this->validateRequest($request);
+        $auth = $this->authenticateRequest($request, true);
+        if ($auth instanceof JsonResponse) {
+            return $auth; // Return error response if authentication fails
+        }
+
+        $this->validateRequest($request, true);
 
         $achievement = Achievement::create($request->all());
 
@@ -32,6 +38,11 @@ class AchievementController extends Controller
 
     public function delete($id)
     {
+        $auth = $this->authenticateRequest(request(), true);
+        if ($auth instanceof JsonResponse) {
+            return $auth; // Return error response if authentication fails
+        }
+
         $achievement = Achievement::findOrFail($id);
         $achievement->delete();
 
@@ -40,7 +51,12 @@ class AchievementController extends Controller
 
     public function update($id, Request $request)
     {
-        $this->validateRequest($request);
+        $auth = $this->authenticateRequest($request, true);
+        if ($auth instanceof JsonResponse) {
+            return $auth; // Return error response if authentication fails
+        }
+
+        $this->validateRequest($request, false);
 
         $achievement = Achievement::findOrFail($id);
         $achievement->update($request->all());
@@ -48,12 +64,16 @@ class AchievementController extends Controller
         return response()->json($achievement);
     }
 
-    function validateRequest(Request $request): void
+    function validateRequest(Request $request, bool $required): void
     {
+        function requiredIf($condition, $field)
+        {
+            return $condition ? 'required|' . $field : $field;
+        }
         $request->validate([
-            'name' => "required|string|max:255",
-            'description' => 'required|string|max:1000',
-            'image_url' => 'required|url|max:500',
+            'name' => requiredIf($required, "string|max:255"),
+            'description' => requiredIf($required, 'string|max:1000'),
+            'image_url' => requiredIf($required, 'url|max:500'),
         ]);
     }
 }
